@@ -1,0 +1,10 @@
+server:
+  port: 8080
+
+
+spring:
+  application:
+    name: http-request-restrict-spring-boot-tests
+
+  profiles:
+    active: demo
