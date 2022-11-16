@@ -19,11 +19,11 @@
 
 
 
-## 2 yaml里配置http-request-restrict元数据
+## 2 应用yaml配置元数据
 
 **这里以`Sa-Token`作为`token`逻辑演示**
 
-[Github示例链接](https://github.com/Weasley-J/http-request-restrict-spring-parent/blob/main/http-request-restrict-spring-boot-tests/src/main/resources/application-demo.yml)
+### 2.1 [Github示例链接](https://github.com/Weasley-J/http-request-restrict-spring-parent/blob/main/http-request-restrict-spring-boot-tests/src/main/resources/application-demo.yml)
 
 ```yaml
 spring:
@@ -38,6 +38,8 @@ spring:
   request:
     restrict:
       enable: on
+      # 指定要解析的请求头名称列表, 多个满足一个即可作为key, @ApiRestrict注解里面的'headName'和'cookieName'
+      # 优先级: headName > cookieName > header-keys
       header-keys:
         - x-auth-token
       redis:
@@ -99,14 +101,61 @@ sa-token:
     <artifactId>sa-plugin-redis-spring-boot-starter</artifactId>
     <version>1.0.2</version>
 </dependency>
-<!-- redis启动器 -->
+        <!-- redis启动器 -->
 <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-redis</artifactId>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-starter-data-redis</artifactId>
 </dependency>
 ```
 
+### 2.2 注解`@ApiRestrict`使用示例
 
+一下接口调用前先要调用**登录接口**获取指定的`token`
+
+```java
+/**
+ * Api Restrict Common Controller
+ *
+ * @author weasley
+ * @version 1.0.0
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/public/demo")
+public class ApiRestrictDemoController {
+
+    @PostMapping("/clickOnce5Seconds")
+    @ApiRestrict(value = 5, maxCount = 1, timeUnit = TimeUnit.SECONDS) //5秒内点仅能点击1次
+    public void clickOnce5Seconds() {
+        log.info("5秒内点仅能点击1次");
+    }
+
+    @PostMapping("/click2Times10Seconds")
+    @ApiRestrict(value = 10, maxCount = 2, timeUnit = TimeUnit.SECONDS) //10秒内仅能点击2次
+    public void click2Times10Seconds() {
+        log.info("10秒内仅能点击2次");
+    }
+
+    @PostMapping("/click5Times5Minutes")
+    @ApiRestrict(value = 5, maxCount = 5, timeUnit = TimeUnit.MINUTES) //5分钟只能内只能点5次
+    public void click5Times5Minutes() {
+        log.info("5分钟只能内只能点5次");
+    }
+
+    @PostMapping("/click2Times10SecondsByHeaderName")
+    @ApiRestrict(value = 5, maxCount = 1, timeUnit = TimeUnit.SECONDS, headName = "x-auth-token") //5秒内仅能点击1次, 解析请求头
+    public void click2Times10SecondsByHeaderName() {
+        log.info("指定headerName: 5秒内仅能点击1次");
+    }
+
+    @PostMapping("/click2Times10SecondsByCookieName")
+    @ApiRestrict(value = 10, maxCount = 1, timeUnit = TimeUnit.SECONDS, cookieName = "x-auth-token")
+    //10秒内仅能点击2次,解析cookie
+    public void click2Times10SecondsByCookieName() {
+        log.info("指定cookieName: 10秒内仅能点击2次");
+    }
+}
+```
 
 ## 3 通过注解装配bean开启功能
 
