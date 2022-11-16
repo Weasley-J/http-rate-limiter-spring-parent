@@ -48,7 +48,7 @@ public class RequestRestrictRedissonConfig {
         }
         String version = Version.getVersion();
         if (StringUtils.isNotBlank(version)) {
-            log.info("Http request restrict: v" + version);
+            log.info("Http request restrict version: " + version);
         }
         return Redisson.create(config);
     }
