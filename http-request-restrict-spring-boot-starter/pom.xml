@@ -30,7 +30,7 @@
         <snakeyaml.version>1.33</snakeyaml.version>
         <redisson.version>3.18.0</redisson.version>
         <jedis.version>4.3.1</jedis.version>
-        <hutool-all.version>5.8.9</hutool-all.version>
+        <hutool-all.version>5.8.10</hutool-all.version>
     </properties>
 
     <url>https://github.com/Weasley-J/http-request-restrict-spring-parent</url>
