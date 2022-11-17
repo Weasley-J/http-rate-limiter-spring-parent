@@ -4,6 +4,7 @@ import io.github.weasleyj.request.restrict.RequestRestrictHandler;
 import io.github.weasleyj.request.restrict.RestrictCancelStrategy;
 import io.github.weasleyj.request.restrict.annotation.ApiRestrict;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,6 +41,12 @@ public class ApiRestrictDemoController {
         log.info("5分钟只能内只能点5次");
     }
 
+    @PostMapping("/click5Times5Minutes/{id}")
+    @ApiRestrict(value = 5, maxCount = 5, timeUnit = TimeUnit.MINUTES)
+    public void click5Times5Minutes(@PathVariable("id") String id) {
+        log.info("5分钟只能内只能点5次 {}", id);
+    }
+
     @PostMapping("/click2Times10SecondsByHeaderName")
     @ApiRestrict(value = 5, maxCount = 1, timeUnit = TimeUnit.SECONDS, headName = "x-auth-token")
     public void click2Times10SecondsByHeaderName() {
@@ -47,7 +54,7 @@ public class ApiRestrictDemoController {
     }
 
     @PostMapping("/click2Times10SecondsByCookieName")
-    @ApiRestrict(value = 10, maxCount = 1, timeUnit = TimeUnit.SECONDS, cookieName = "x-auth-token")
+    @ApiRestrict(value = 10, maxCount = 2, timeUnit = TimeUnit.SECONDS, cookieName = "x-auth-token")
     public void click2Times10SecondsByCookieName() {
         log.info("指定cookieName: 10秒内仅能点击2次");
     }

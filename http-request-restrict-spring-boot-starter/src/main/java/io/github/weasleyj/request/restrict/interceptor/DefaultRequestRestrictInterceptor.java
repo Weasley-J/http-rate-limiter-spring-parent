@@ -1,10 +1,12 @@
 package io.github.weasleyj.request.restrict.interceptor;
 
+import cn.hutool.core.date.TemporalUtil;
 import cn.hutool.json.JSONUtil;
 import io.github.weasleyj.request.restrict.RequestRestrictHandler;
 import io.github.weasleyj.request.restrict.annotation.ApiRestrict;
 import io.github.weasleyj.request.restrict.annotation.EnableApiRestrict;
-import io.github.weasleyj.request.restrict.config.RequestRestrictHeaderProperties;
+import io.github.weasleyj.request.restrict.config.RedisVersion;
+import io.github.weasleyj.request.restrict.config.RequestRestrictProperties;
 import io.github.weasleyj.request.restrict.exception.FrequentRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -12,17 +14,19 @@ import org.redisson.api.RBucket;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -42,16 +46,22 @@ import java.util.concurrent.TimeUnit;
 @Component
 @ConditionalOnClass({EnableApiRestrict.class})
 public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
-    private final StringCodec stringCodec;
-    private final RedissonClient redissonClient;
-    private final RequestRestrictHeaderProperties restrictHeaderProperties;
 
-    @Autowired(required = false)
-    public DefaultRequestRestrictInterceptor(StringCodec stringCodec, RedissonClient redissonClient, RequestRestrictHeaderProperties restrictHeaderProperties) {
+    private final StringCodec stringCodec;
+    private final RedisVersion redisVersion;
+    private final RedissonClient redissonClient;
+    private final RequestRestrictProperties restrictHeaderProperties;
+
+    public DefaultRequestRestrictInterceptor(StringCodec stringCodec,
+                                             RedisVersion redisVersion,
+                                             RedissonClient redissonClient,
+                                             RequestRestrictProperties restrictHeaderProperties) {
         this.stringCodec = stringCodec;
+        this.redisVersion = redisVersion;
         this.redissonClient = redissonClient;
         this.restrictHeaderProperties = restrictHeaderProperties;
     }
+
 
     /**
      * Get Api Restrict Annotation
@@ -93,17 +103,17 @@ public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
             handleHeaderValueFromCookie(request, headerMap);
             if (CollectionUtils.isEmpty(headerMap)) {
                 if (log.isWarnEnabled()) {
-                    log.warn("DefaultRequestRestrictInterceptor请求头缺失: {}", JSONUtil.toJsonStr(restrictHeaderProperties.getHeaderKeys()));
+                    log.warn("DefaultRequestRestrictInterceptor请求头缺失，不触发限流；{}", JSONUtil.toJsonStr(restrictHeaderProperties.getHeaderKeys()));
                 }
                 return true;
             }
         }
 
-        boolean shouldRestrict = shouldRestrict(restrict, headerMap);
+        boolean shouldRestrict = shouldRestrict(restrict, headerMap, request);
         if (Objects.equals(shouldRestrict, true)) {
-            log.info("触发接口防刷 {}, {}", request.getRequestURI(), JSONUtil.toJsonStr(headerMap));
-            String formatMsg = MessageFormat.format("接口URI: {0}, {1}({2})内仅能请求{3}次", request.getRequestURI(), restrict.value(), restrict.timeUnit(), restrict.maxCount());
-            throw new FrequentRequestException("操作太过频繁，请稍后再试（" + formatMsg + "）");
+            log.warn("触发防刷，接口URI：{}, header_map: {}", request.getRequestURI(), JSONUtil.toJsonStr(headerMap));
+            String formatMsg = MessageFormat.format("接口：{0}, {1} {2}内仅能请求{3}次。", request.getRequestURI(), restrict.value(), restrict.timeUnit().toString().toLowerCase(), restrict.maxCount());
+            throw new FrequentRequestException("操作太过频繁，请稍后再试；" + formatMsg + "。");
         }
 
         return true;
@@ -120,7 +130,7 @@ public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
             ApiRestrict restrict = getApiRestrictAnnotation(handler);
             if (restrict == null) return;
 
-            String redisKeyName = getRedisKeyName(headerMap, restrict);
+            String redisKeyName = getRedisKeyName(headerMap, restrict, request);
             if (null == redisKeyName) return;
 
             RBucket<Object> bucket = redissonClient.getBucket(redisKeyName);
@@ -131,21 +141,25 @@ public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
     }
 
     /**
-     * 判断请求接口是否是：防重复提交
+     * 判断请求接口是否需要防重复提交
      *
      * @return false: 不需要防
      */
-    public boolean shouldRestrict(ApiRestrict restrict, Map<String, Object> headerMap) throws InterruptedException {
+    public boolean shouldRestrict(ApiRestrict restrict, Map<String, Object> headerMap, HttpServletRequest request) throws InterruptedException {
         if (CollectionUtils.isEmpty(headerMap)) return false;
 
-        String redisKeyName = getRedisKeyName(headerMap, restrict);
+        String redisKeyName = getRedisKeyName(headerMap, restrict, request);
         if (null == redisKeyName) return false;
-
+        if (log.isDebugEnabled()) {
+            log.debug("判断请求接口是否需要防重复提交, redis_key_name: {}, header_map: {}", redisKeyName, JSONUtil.toJsonStr(headerMap));
+        }
         RBucket<Object> bucket = redissonClient.getBucket(redisKeyName, stringCodec);
         if (!bucket.isExists()) {
             RSemaphore semaphore = redissonClient.getSemaphore(redisKeyName);
             semaphore.trySetPermits(restrict.maxCount());
-            bucket.setIfExists(restrict.maxCount(), restrict.value(), restrict.timeUnit());
+            if (redisVersion.getIntVersion() >= 7) {
+                semaphore.expireIfNotSet(Duration.of(restrict.value(), TemporalUtil.toChronoUnit(restrict.timeUnit())));
+            } else bucket.setIfExists(restrict.maxCount(), restrict.value(), restrict.timeUnit());
             return false;
         }
 
@@ -203,14 +217,14 @@ public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
     /**
      * Get the Redis Key Name
      */
-    public String getRedisKeyName(Map<String, Object> headerMap, ApiRestrict restrict) {
+    public String getRedisKeyName(Map<String, Object> headerMap, ApiRestrict restrict, HttpServletRequest request) {
         if (CollectionUtils.isEmpty(headerMap)) return null;
-        RequestRestrictHeaderProperties.RedisProperties redisProperties = restrictHeaderProperties.getRedis();
+        RequestRestrictProperties.RedisProperties redis = restrictHeaderProperties.getRedis();
         if (StringUtils.isNotBlank(restrict.headName())) {
-            return redisProperties.getKeyPrefix() + headerMap.get(restrict.headName());
+            return redis.getKeyPrefix() + DigestUtils.md5DigestAsHex((headerMap.get(restrict.headName()) + ":" + request.getRequestURI()).getBytes(StandardCharsets.UTF_8));
         }
         if (StringUtils.isNotBlank(restrict.cookieName())) {
-            return redisProperties.getKeyPrefix() + headerMap.get(restrict.cookieName());
+            return redis.getKeyPrefix() + DigestUtils.md5DigestAsHex((headerMap.get(restrict.cookieName()) + ":" + request.getRequestURI()).getBytes(StandardCharsets.UTF_8));
         }
         String redisKeyName = null;
         String realTokenValue = null;
@@ -218,13 +232,14 @@ public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
         for (Map.Entry<String, Object> entry : entries) {
             realTokenValue = entry.getValue().toString();
             if (StringUtils.isNotBlank(realTokenValue)) {
-                redisKeyName = redisProperties.getKeyPrefix() + realTokenValue;
+                redisKeyName = realTokenValue;
                 break;
             }
         }
         if (null == realTokenValue) {
             return null;
         }
-        return redisKeyName;
+        String md5DigestAsHex = DigestUtils.md5DigestAsHex((redisKeyName + ":" + request.getRequestURI()).getBytes(StandardCharsets.UTF_8));
+        return redis.getKeyPrefix() + md5DigestAsHex;
     }
 }

@@ -6,6 +6,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.json.JSONUtil;
 import com.example.request.entity.AuthenticationRequest;
 import com.example.request.entity.AuthenticationResponse;
+import io.github.weasleyj.request.restrict.annotation.ApiRestrict;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +48,7 @@ public class AuthenticationController {
     /**
      * 查询登录状态
      */
+    @ApiRestrict
     @GetMapping("/login/status")
     public Boolean getLoginStatus(HttpServletRequest request) {
         log.info("查询登录状态 {}", StpUtil.getLoginId());

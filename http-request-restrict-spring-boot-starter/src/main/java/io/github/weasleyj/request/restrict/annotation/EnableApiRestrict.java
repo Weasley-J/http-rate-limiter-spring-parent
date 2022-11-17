@@ -1,6 +1,6 @@
 package io.github.weasleyj.request.restrict.annotation;
 
-import io.github.weasleyj.request.restrict.config.RequestRestrictHeaderProperties;
+import io.github.weasleyj.request.restrict.config.RequestRestrictProperties;
 import io.github.weasleyj.request.restrict.config.RequestRestrictRedissonConfig;
 import io.github.weasleyj.request.restrict.config.RequestRestrictWebMvcConfig;
 import io.github.weasleyj.request.restrict.interceptor.DefaultRequestRestrictInterceptor;
@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 @Documented
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Import({RequestRestrictWebMvcConfig.class, RequestRestrictHeaderProperties.class,
+@Import({RequestRestrictWebMvcConfig.class, RequestRestrictProperties.class,
         DefaultRequestRestrictInterceptor.class, RequestRestrictRedissonConfig.class,
 })
 public @interface EnableApiRestrict {

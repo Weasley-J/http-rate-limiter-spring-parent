@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-import static io.github.weasleyj.request.restrict.config.RequestRestrictHeaderProperties.PREFIX;
+import static io.github.weasleyj.request.restrict.config.RequestRestrictProperties.PREFIX;
 
 /**
  * Api Restrict Properties
@@ -25,7 +25,7 @@ import static io.github.weasleyj.request.restrict.config.RequestRestrictHeaderPr
 @Configuration
 @ConditionalOnClass({EnableApiRestrict.class})
 @ConfigurationProperties(prefix = PREFIX)
-public class RequestRestrictHeaderProperties {
+public class RequestRestrictProperties {
     public static final String PREFIX = "spring.request.restrict";
     /**
      * 是否启用
@@ -54,9 +54,25 @@ public class RequestRestrictHeaderProperties {
          * use "rediss://" for SSL connection
          */
         private Boolean enableSsl = false;
-        private String host;
-        private String port;
+        /**
+         * Redis host
+         */
+        private String host = "localhost";
+        /**
+         * Redis port
+         */
+        private int port = 6379;
+        /**
+         * Redis user
+         */
+        private String user;
+        /**
+         * Redis password
+         */
         private String password;
+        /**
+         * Redis database
+         */
         private Integer database;
     }
 }

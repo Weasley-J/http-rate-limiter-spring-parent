@@ -1,6 +1,6 @@
 package io.github.weasleyj.request.restrict.annotation;
 
-import io.github.weasleyj.request.restrict.config.RequestRestrictHeaderProperties;
+import io.github.weasleyj.request.restrict.config.RequestRestrictProperties;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -47,7 +47,7 @@ public @interface ApiRestrict {
      * The head name from HttpServletRequest
      *
      * @apiNote priority: headName > headerKeys
-     * @see RequestRestrictHeaderProperties#headerKeys
+     * @see RequestRestrictProperties#headerKeys
      */
     String headName() default "";
 
@@ -55,7 +55,7 @@ public @interface ApiRestrict {
      * The cookie name from HttpServletRequest
      *
      * @apiNote priority: cookieName > headerKeys
-     * @see RequestRestrictHeaderProperties#headerKeys
+     * @see RequestRestrictProperties#headerKeys
      */
     String cookieName() default "";
 }
