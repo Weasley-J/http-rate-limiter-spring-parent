@@ -1,13 +1,12 @@
 package io.github.weasleyj.request.restrict.interceptor;
 
-import cn.hutool.core.date.TemporalUtil;
-import cn.hutool.json.JSONUtil;
 import io.github.weasleyj.request.restrict.RequestRestrictHandler;
 import io.github.weasleyj.request.restrict.annotation.ApiRestrict;
 import io.github.weasleyj.request.restrict.annotation.EnableApiRestrict;
 import io.github.weasleyj.request.restrict.config.RedisVersion;
 import io.github.weasleyj.request.restrict.config.RequestRestrictProperties;
 import io.github.weasleyj.request.restrict.exception.FrequentRequestException;
+import io.github.weasleyj.request.restrict.util.TemporalUnitUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
@@ -103,7 +102,7 @@ public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
             handleHeaderValueFromCookie(request, headerMap);
             if (CollectionUtils.isEmpty(headerMap)) {
                 if (log.isWarnEnabled()) {
-                    log.warn("DefaultRequestRestrictInterceptor请求头缺失，不触发限流；{}", JSONUtil.toJsonStr(restrictHeaderProperties.getHeaderKeys()));
+                    log.warn("DefaultRequestRestrictInterceptor请求头缺失，不触发限流；{}", restrictHeaderProperties.getHeaderKeys());
                 }
                 return true;
             }
@@ -111,7 +110,7 @@ public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
 
         boolean shouldRestrict = shouldRestrict(restrict, headerMap, request);
         if (Objects.equals(shouldRestrict, true)) {
-            log.warn("触发防刷，接口URI：{}, header_map: {}", request.getRequestURI(), JSONUtil.toJsonStr(headerMap));
+            log.warn("触发防刷，接口URI：{}, header_map: {}", request.getRequestURI(), headerMap);
             String formatMsg = MessageFormat.format("接口：{0}, {1} {2}内仅能请求{3}次。", request.getRequestURI(), restrict.value(), restrict.timeUnit().toString().toLowerCase(), restrict.maxCount());
             throw new FrequentRequestException("操作太过频繁，请稍后再试；" + formatMsg + "。");
         }
@@ -151,14 +150,14 @@ public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
         String redisKeyName = getRedisKeyName(headerMap, restrict, request);
         if (null == redisKeyName) return false;
         if (log.isDebugEnabled()) {
-            log.debug("判断请求接口是否需要防重复提交, redis_key_name: {}, header_map: {}", redisKeyName, JSONUtil.toJsonStr(headerMap));
+            log.debug("判断请求接口是否需要防重复提交, redis_key_name: {}, header_map: {}", redisKeyName, headerMap);
         }
         RBucket<Object> bucket = redissonClient.getBucket(redisKeyName, stringCodec);
         if (!bucket.isExists()) {
             RSemaphore semaphore = redissonClient.getSemaphore(redisKeyName);
             semaphore.trySetPermits(restrict.maxCount());
             if (redisVersion.getIntVersion() >= 7) {
-                semaphore.expireIfNotSet(Duration.of(restrict.value(), TemporalUtil.toChronoUnit(restrict.timeUnit())));
+                semaphore.expireIfNotSet(Duration.of(restrict.value(), TemporalUnitUtils.toChronoUnit(restrict.timeUnit())));
             } else bucket.setIfExists(restrict.maxCount(), restrict.value(), restrict.timeUnit());
             return false;
         }
@@ -209,7 +208,7 @@ public class DefaultRequestRestrictInterceptor implements HandlerInterceptor {
                     }
                 }
             } catch (Exception e) {
-                log.error("解析headerKe {}发生异常 {}", headerKey, JSONUtil.toJsonStr(headerMap), e);
+                log.error("解析headerKe {}发生异常 {}", headerKey, headerMap, e);
             }
         }
     }
