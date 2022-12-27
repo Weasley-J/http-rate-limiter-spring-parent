@@ -63,9 +63,9 @@ public class RequestRestrictProperties {
          */
         private int port = 6379;
         /**
-         * Redis user
+         * Redis username
          */
-        private String user;
+        private String username;
         /**
          * Redis password
          */

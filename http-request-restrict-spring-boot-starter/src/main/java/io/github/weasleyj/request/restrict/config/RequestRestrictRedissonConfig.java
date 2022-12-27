@@ -42,7 +42,10 @@ public class RequestRestrictRedissonConfig {
     public RedissonClient redissonClient() {
         RequestRestrictProperties.RedisProperties redis = redisProperties.getRedis();
         Config config = new Config();
-        SingleServerConfig singleServer = config.useSingleServer().setPassword(redis.getPassword()).setDatabase(redis.getDatabase());
+        SingleServerConfig singleServer = config.useSingleServer()
+                .setUsername(redis.getUsername())
+                .setPassword(redis.getPassword())
+                .setDatabase(redis.getDatabase());
         if (redis.getEnableSsl().equals(true)) {
             singleServer.setAddress("rediss://" + redis.getHost() + ":" + redis.getPort());
         } else {
@@ -95,7 +98,7 @@ public class RequestRestrictRedissonConfig {
 
         @Override
         public String getUser() {
-            return redis.getUser();
+            return redis.getUsername();
         }
 
         @Override
