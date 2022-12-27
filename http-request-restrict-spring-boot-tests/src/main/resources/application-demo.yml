@@ -16,6 +16,7 @@ spring:
         enable-ssl: off
         host: ${spring.redis.host}
         port: ${spring.redis.port}
+        username:
         password: ${spring.redis.password}
         database: ${spring.redis.database}
 
@@ -44,5 +45,7 @@ sa-token:
       independent-redis:
         host: ${spring.redis.host}
         port: ${spring.redis.port}
+        username:
         password: ${spring.redis.password}
         database: ${spring.redis.database}
+        ssl: off

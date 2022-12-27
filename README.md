@@ -99,7 +99,7 @@ sa-token:
 <dependency>
     <groupId>io.github.weasley-j</groupId>
     <artifactId>sa-plugin-redis-spring-boot-starter</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 </dependency>
         <!-- redis启动器 -->
 <dependency>

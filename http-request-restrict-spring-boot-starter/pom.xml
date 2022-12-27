@@ -11,7 +11,7 @@
 
     <groupId>io.github.weasley-j</groupId>
     <artifactId>http-request-restrict-spring-boot-starter</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <name>http-request-restrict-spring-boot-starter</name>
     <description>
         一个用于支持`springboot`项目`http`请求限制的`starter`，通过识别客户端传来`token`值(具有唯一标志性)来实现：同一个用户在一定的时间频次内最多只能点击`N`次特定接口的功能
@@ -28,7 +28,7 @@
         <maven-gpg.version>3.0.1</maven-gpg.version>
         <!-- deploy end -->
         <snakeyaml.version>1.33</snakeyaml.version>
-        <redisson.version>3.18.0</redisson.version>
+        <redisson.version>3.19.0</redisson.version>
         <jedis.version>4.3.1</jedis.version>
         <hutool-all.version>5.8.10</hutool-all.version>
     </properties>
@@ -77,11 +77,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool-all.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
