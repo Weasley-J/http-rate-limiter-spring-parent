@@ -1,9 +1,9 @@
-# http-request-restrict-spring-boot-starter
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.weasley-j/http-request-restrict-spring-boot-starter)](https://search.maven.org/artifact/io.github.weasley-j/http-request-restrict-spring-boot-starter)
+# http-rate-limiter-spring-boot-starter
 
-一个用于支持`springboot`项目`http`请求限制的`starter`，通过识别客户端传来`token`值(具有唯一标志性)来实现：同一个用户在一定的时间频次内最多只能点击`N`次特定接口的功能
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.weasley-j/http-rate-limiter-spring-boot-starter)](https://search.maven.org/artifact/io.github.weasley-j/http-rate-limiter-spring-boot-starter)
 
-
+一个用于支持`springboot`项目`http`请求限制的`starter`，通过识别客户端传来`token`值(具有唯一标志性)
+来实现：同一个用户在一定的时间频次内最多只能点击`N`次特定接口的功能
 
 ## 1 映入pom坐标
 
@@ -12,7 +12,7 @@
 ```xml
 <dependency>
   <groupId>io.github.weasley-j</groupId>
-  <artifactId>http-request-restrict-spring-boot-starter</artifactId>
+  <artifactId>http-rate-limiter-spring-boot-starter</artifactId>
   <version>${latest.version}</version>
 </dependency>
 ```
@@ -23,7 +23,7 @@
 
 **这里以`Sa-Token`作为`token`逻辑演示**
 
-### 2.1 [Github示例链接](https://github.com/Weasley-J/http-request-restrict-spring-parent/blob/main/http-request-restrict-spring-boot-tests/src/main/resources/application-demo.yml)
+### 2.1 [Github示例链接](https://github.com/Weasley-J/http-rate-limiter-spring-parent/blob/main/http-rate-limiter-spring-boot-tests/src/main/resources/application-demo.yml)
 
 ```yaml
 spring:
@@ -38,7 +38,7 @@ spring:
   request:
     restrict:
       enable: on
-      # 指定要解析的请求头名称列表, 多个满足一个即可作为key, @ApiRestrict注解里面的'headName'和'cookieName'
+      # 指定要解析的请求头名称列表, 多个满足一个即可作为key, @RateLimit注解里面的'headName'和'cookieName'
       # 优先级: headName > cookieName > header-keys
       header-keys:
         - x-auth-token
@@ -108,7 +108,7 @@ sa-token:
 </dependency>
 ```
 
-### 2.2 注解`@ApiRestrict`使用示例
+### 2.2 注解`@RateLimit`使用示例
 
 一下接口调用前先要调用**登录接口**获取指定的`token`
 
@@ -122,34 +122,34 @@ sa-token:
 @Slf4j
 @RestController
 @RequestMapping("/api/public/demo")
-public class ApiRestrictDemoController {
+public class RateLimitDemoController {
 
     @PostMapping("/clickOnce5Seconds")
-    @ApiRestrict(value = 5, maxCount = 1, timeUnit = TimeUnit.SECONDS) //5秒内点仅能点击1次
+    @RateLimit(value = 5, maxCount = 1, timeUnit = TimeUnit.SECONDS) //5秒内点仅能点击1次
     public void clickOnce5Seconds() {
         log.info("5秒内点仅能点击1次");
     }
 
     @PostMapping("/click2Times10Seconds")
-    @ApiRestrict(value = 10, maxCount = 2, timeUnit = TimeUnit.SECONDS) //10秒内仅能点击2次
+    @RateLimit(value = 10, maxCount = 2, timeUnit = TimeUnit.SECONDS) //10秒内仅能点击2次
     public void click2Times10Seconds() {
         log.info("10秒内仅能点击2次");
     }
 
     @PostMapping("/click5Times5Minutes")
-    @ApiRestrict(value = 5, maxCount = 5, timeUnit = TimeUnit.MINUTES) //5分钟只能内只能点5次
+    @RateLimit(value = 5, maxCount = 5, timeUnit = TimeUnit.MINUTES) //5分钟只能内只能点5次
     public void click5Times5Minutes() {
         log.info("5分钟只能内只能点5次");
     }
 
     @PostMapping("/click2Times10SecondsByHeaderName")
-    @ApiRestrict(value = 5, maxCount = 1, timeUnit = TimeUnit.SECONDS, headName = "x-auth-token") //5秒内仅能点击1次, 解析请求头
+    @RateLimit(value = 5, maxCount = 1, timeUnit = TimeUnit.SECONDS, headName = "x-auth-token") //5秒内仅能点击1次, 解析请求头
     public void click2Times10SecondsByHeaderName() {
         log.info("指定headerName: 5秒内仅能点击1次");
     }
 
     @PostMapping("/click2Times10SecondsByCookieName")
-    @ApiRestrict(value = 10, maxCount = 1, timeUnit = TimeUnit.SECONDS, cookieName = "x-auth-token")
+    @RateLimit(value = 10, maxCount = 1, timeUnit = TimeUnit.SECONDS, cookieName = "x-auth-token")
     //10秒内仅能点击2次,解析cookie
     public void click2Times10SecondsByCookieName() {
         log.info("指定cookieName: 10秒内仅能点击2次");
@@ -160,7 +160,7 @@ public class ApiRestrictDemoController {
 ## 3 通过注解装配bean开启功能
 
 ```java
-import io.github.weasleyj.request.restrict.annotation.EnableApiRestrict;
+import annotation.io.github.weasleyj.http.rate.limit.EnableHttpRateLimit;
 import io.github.weasleyj.satoken.session.annotation.EnableSaIndependentRedisSession;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -169,7 +169,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * DEMO APP
  */
 @SpringBootApplication
-@EnableApiRestrict //主体注解
+@EnableRateLimit //主体注解
 @EnableSaIndependentRedisSession
 public class HttpRequestRestrictDemoApp {
 
@@ -186,7 +186,7 @@ public class HttpRequestRestrictDemoApp {
 
 - 访问登录接口获取`token`
 
-[源码](https://github.com/Weasley-J/http-request-restrict-spring-parent/blob/main/http-request-restrict-spring-boot-tests/src/main/java/com/example/request/controller/AuthenticationController.java)
+[源码](https://github.com/Weasley-J/http-rate-limiter-spring-parent/blob/main/http-rate-limiter-spring-boot-tests/src/main/java/com/example/request/controller/AuthenticationController.java)
 
 http://localhost:8080/api/public/auth/login/token
 
@@ -207,7 +207,7 @@ http://localhost:8080/api/public/auth/login/token
 
 - 使用`API`工具调用限流接口
 
-[源码](https://github.com/Weasley-J/http-request-restrict-spring-parent/blob/main/http-request-restrict-spring-boot-tests/src/main/java/com/example/request/controller/ApiRestrictDemoController.java)
+[源码](https://github.com/Weasley-J/http-rate-limiter-spring-parent/blob/main/http-rate-limiter-spring-boot-tests/src/main/java/com/example/request/controller/RateLimitDemoController.java)
 
 10秒内仅能点击2次: http://localhost:8080/api/public/demo/click2Times10Seconds
 
@@ -216,8 +216,8 @@ http://localhost:8080/api/public/auth/login/token
 **触发限流抛出异常方便开发者进行捕获处理，给前端发返回提示。**
 
 ```java
-io.github.weasleyj.request.restrict.exception.FrequentRequestException: 操作太过频繁，请稍后再试（接口URI: /api/public/demo/click2Times10Seconds, 10(SECONDS)内仅能请求2次）
-	at io.github.weasleyj.request.restrict.interceptor.DefaultRequestRestrictInterceptor.preHandle(DefaultRequestRestrictInterceptor.java:106) ~[classes/:na]
+exception.io.github.weasleyj.http.rate.limit.FrequentRequestException: 操作太过频繁，请稍后再试（接口URI: /api/public/demo/click2Times10Seconds, 10(SECONDS)内仅能请求2次）
+	at interceptor.io.github.weasleyj.http.rate.limit.DefaultRequestRestrictInterceptor.preHandle(DefaultRequestRestrictInterceptor.java:106) ~[classes/:na]
 	at org.springframework.web.servlet.HandlerExecutionChain.applyPreHandle(HandlerExecutionChain.java:148) ~[spring-webmvc-5.3.23.jar:5.3.23]
 	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1066) ~[spring-webmvc-5.3.23.jar:5.3.23]
 	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:964) ~[spring-webmvc-5.3.23.jar:5.3.23]
