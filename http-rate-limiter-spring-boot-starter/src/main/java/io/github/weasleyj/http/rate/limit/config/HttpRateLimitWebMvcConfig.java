@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Api Restrict Web Mvc Configure
+ * Http Rate Limit Web Mvc Configure
  *
  * @author weasley
  * @version 1.0.0

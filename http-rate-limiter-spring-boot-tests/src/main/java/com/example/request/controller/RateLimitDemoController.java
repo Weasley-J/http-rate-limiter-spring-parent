@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Api Restrict Common Controller
+ * rate limit demo controller
  *
  * @author weasley
  * @version 1.0.0

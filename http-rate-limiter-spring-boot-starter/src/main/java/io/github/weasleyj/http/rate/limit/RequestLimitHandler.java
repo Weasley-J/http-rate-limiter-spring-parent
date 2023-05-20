@@ -8,7 +8,7 @@ package io.github.weasleyj.http.rate.limit;
  */
 public class RequestLimitHandler {
     /**
-     * the strategy for cancelling api restrict
+     * the strategy for cancelling rate limit
      */
     private static final ThreadLocal<CancelLimitStrategy> CANCEL_STRATEGY = new ThreadLocal<>();
 

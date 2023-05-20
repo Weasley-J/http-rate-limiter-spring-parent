@@ -34,7 +34,7 @@ spring:
     password: 123456
     database: 0
 
-  #  API restrict Config（组件主体配置）
+  #  Config（组件主体配置）
   request:
     restrict:
       enable: on
@@ -114,7 +114,7 @@ sa-token:
 
 ```java
 /**
- * Api Restrict Common Controller
+ * Rate Limit Demo Controller
  *
  * @author weasley
  * @version 1.0.0

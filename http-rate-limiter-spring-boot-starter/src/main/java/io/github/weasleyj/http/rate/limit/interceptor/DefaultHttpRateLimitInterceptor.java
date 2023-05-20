@@ -58,7 +58,7 @@ public class DefaultHttpRateLimitInterceptor implements HandlerInterceptor {
 
 
     /**
-     * Get Api Restrict Annotation
+     * Get rate limit annotation
      */
     public static RateLimit getRateLimitAnnotation(Object handler) {
         HandlerMethod handlerMethod;

@@ -14,7 +14,7 @@ import java.util.List;
 import static io.github.weasleyj.http.rate.limit.config.HttpRateLimitProperties.PREFIX;
 
 /**
- * Api Restrict Properties
+ * Http rate limit properties
  *
  * @author weasley
  * @version 1.0.0
