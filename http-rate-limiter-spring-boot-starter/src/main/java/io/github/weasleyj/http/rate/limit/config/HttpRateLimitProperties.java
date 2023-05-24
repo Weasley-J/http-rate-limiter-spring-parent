@@ -54,6 +54,9 @@ public class HttpRateLimitProperties {
     private RedisProperties redis;
 
 
+    /**
+     * redis配置属性
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -61,7 +64,7 @@ public class HttpRateLimitProperties {
         /**
          * Redis的缓存key的前缀
          */
-        private String keyPrefix = "http:request.restrict:";
+        private String keyPrefix = "http:rate:limit:";
         /**
          * use "rediss://" for SSL connection
          */
