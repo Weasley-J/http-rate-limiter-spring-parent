@@ -22,4 +22,15 @@ public interface RateLimitStrategy {
      * @throws InterruptedException throw
      */
     boolean tryLimit(RateLimit rateLimit, Map<String, Object> headers, HttpServletRequest request) throws InterruptedException;
+
+    /**
+     * Rewrite this method to generate your customize rate limit key
+     *
+     * @return Rate limit key
+     */
+    default String getRateLimitKey() {
+        // to generate your customize rate limit key
+        return null;
+    }
+
 }

@@ -47,7 +47,7 @@ public class DefaultCounterRateLimitStrategy implements RateLimitStrategy {
     @Override
     public boolean tryLimit(RateLimit rateLimit, Map<String, Object> headers, HttpServletRequest request) throws InterruptedException {
         if (CollectionUtils.isEmpty(headers)) return false;
-        String redisKeyName = DefaultHttpRateLimitInterceptor.getRedisKey(new RedisKeyRequest()
+        String redisKeyName = DefaultHttpRateLimitInterceptor.getRateLimitKey(new RedisKeyRequest()
                 .setHeaders(headers)
                 .setRateLimit(rateLimit)
                 .setHttpServletRequest(request)
