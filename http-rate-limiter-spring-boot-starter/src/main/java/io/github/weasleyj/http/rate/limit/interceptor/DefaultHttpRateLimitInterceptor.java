@@ -37,7 +37,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ConditionalOnClass({EnableHttpRateLimiter.class})
 public class DefaultHttpRateLimitInterceptor implements HandlerInterceptor {
-
+    /**
+     * The throttling policy is dynamically changed at runtime
+     */
+    public static final ThreadLocal<RateLimitStrategy> RUNTIME_STRATEGY = new ThreadLocal<>();
     private final RedissonClient httpRateLimitRedissonClient;
     private final HttpRateLimitProperties httpRateLimitProperties;
     private final Map<Strategy, RateLimitStrategy> rateLimitStrategyMap;
@@ -124,8 +127,8 @@ public class DefaultHttpRateLimitInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        boolean shouldCancelLimit = RequestLimitHandler.shouldCancelLimit();
-        if (shouldCancelLimit) {
+        RUNTIME_STRATEGY.remove();
+        if (RequestLimitHandler.shouldCancelLimit()) {
             Map<String, Object> headers = handleHeaderValueFromHttpHeader(request);
             handleHeaderValueFromCookie(request, headers);
             if (CollectionUtils.isEmpty(headers)) return;
@@ -209,6 +212,9 @@ public class DefaultHttpRateLimitInterceptor implements HandlerInterceptor {
      * @return The RateLimitStrategy
      */
     public RateLimitStrategy deduceRateLimitStrategy() {
+        if (null != RUNTIME_STRATEGY.get()) {
+            return RUNTIME_STRATEGY.get();
+        }
         return this.rateLimitStrategyMap.get(this.httpRateLimitProperties.getStrategy());
     }
 }

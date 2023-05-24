@@ -17,7 +17,6 @@ public interface RateLimitStrategy {
      * Try to limit your http rates or guarantee idempotent for your handler method of Controller
      *
      * @param rateLimit The annotation of RateLimit
-     * @param headers   The headers of HTTP request
      * @param request   The HttpServletRequest object
      * @return The result is true if success， false: Don't need to limit
      * @throws InterruptedException throw
