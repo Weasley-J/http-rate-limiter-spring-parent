@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -95,7 +96,7 @@ public class DefaultHttpRateLimitInterceptor implements HandlerInterceptor {
         if (StringUtils.isNotBlank(rateLimit.headName()) && StringUtils.isNotBlank(request.getHeader(rateLimit.headName()))) {
             realTokenValue = request.getHeader(rateLimit.headName());
             headers.put(rateLimit.headName(), realTokenValue);
-        } else if (StringUtils.isNotBlank(rateLimit.cookieName()) && null != request.getCookies() && request.getCookies().length > 0) {
+        } else if (StringUtils.isNotBlank(rateLimit.cookieName()) && !ObjectUtils.isEmpty(request.getCookies())) {
             for (Cookie cookie : request.getCookies()) {
                 if (Objects.equals(rateLimit.cookieName(), cookie.getName()) && StringUtils.isNotBlank(cookie.getValue())) {
                     realTokenValue = cookie.getValue();
@@ -177,7 +178,7 @@ public class DefaultHttpRateLimitInterceptor implements HandlerInterceptor {
         for (String headerKey : httpRateLimitProperties.getHeaderKeys()) {
             try {
                 xAuthToken = request.getHeader(headerKey);
-                if (StringUtils.isBlank(xAuthToken) && null != request.getCookies() && request.getCookies().length > 0) {
+                if (StringUtils.isBlank(xAuthToken) && !ObjectUtils.isEmpty(request.getCookies())) {
                     for (Cookie cookie : request.getCookies()) {
                         if (headerKey.equalsIgnoreCase(cookie.getName())) {
                             if (log.isDebugEnabled()) {
