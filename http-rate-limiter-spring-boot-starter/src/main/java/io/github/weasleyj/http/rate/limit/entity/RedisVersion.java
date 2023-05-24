@@ -1,4 +1,4 @@
-package io.github.weasleyj.http.rate.limit;
+package io.github.weasleyj.http.rate.limit.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

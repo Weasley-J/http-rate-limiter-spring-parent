@@ -1,8 +1,8 @@
 package io.github.weasleyj.http.rate.limit.config;
 
-import io.github.weasleyj.http.rate.limit.RedisVersion;
 import io.github.weasleyj.http.rate.limit.Version;
 import io.github.weasleyj.http.rate.limit.annotation.EnableHttpRateLimiter;
+import io.github.weasleyj.http.rate.limit.entity.RedisVersion;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

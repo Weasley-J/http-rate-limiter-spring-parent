@@ -1,5 +1,7 @@
 package io.github.weasleyj.http.rate.limit.config;
 
+import io.github.weasleyj.http.rate.limit.RateLimitStrategy;
+import io.github.weasleyj.http.rate.limit.Strategy;
 import io.github.weasleyj.http.rate.limit.annotation.EnableHttpRateLimiter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +33,16 @@ public class HttpRateLimitProperties {
      * 是否启用
      */
     private Boolean enable = false;
+    /**
+     * Rate limit strategy
+     */
+    private Strategy strategy = Strategy.COUNTER;
+    /**
+     * The strategy Class of users defined
+     *
+     * @apiNote Prioritize the use of user-defined throttling algorithms if specified
+     */
+    private Class<? extends RateLimitStrategy> strategyClass;
     /**
      * API防刷请求头, 客户端传过来
      */
