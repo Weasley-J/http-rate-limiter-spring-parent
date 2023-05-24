@@ -136,12 +136,11 @@ public class DefaultHttpRateLimitInterceptor implements HandlerInterceptor {
             RateLimit rateLimit = getRateLimitAnnotation(handler);
             if (rateLimit == null) return;
 
-            RedisKeyRequest keyRequest = new RedisKeyRequest();
-            keyRequest.setHeaders(headers);
-            keyRequest.setRateLimit(rateLimit);
-            keyRequest.setHttpServletRequest(request);
-            keyRequest.setHttpRateLimitProperties(this.httpRateLimitProperties);
-            String redisKeyName = getRateLimitKey(keyRequest);
+            String redisKeyName = getRateLimitKey(new RedisKeyRequest()
+                    .setHeaders(headers)
+                    .setRateLimit(rateLimit)
+                    .setHttpServletRequest(request)
+                    .setHttpRateLimitProperties(this.httpRateLimitProperties));
             if (null == redisKeyName) return;
 
             RBucket<Object> bucket = httpRateLimitRedissonClient.getBucket(redisKeyName);
