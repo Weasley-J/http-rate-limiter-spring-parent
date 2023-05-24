@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 @ConditionalOnClass({EnableHttpRateLimiter.class})
 @EnableConfigurationProperties({HttpRateLimitProperties.class})
-public class RateLimitStrategyHandler {
+public class RateLimitStrategyConfig {
 
     /**
      * @return Rate limit strategy map
