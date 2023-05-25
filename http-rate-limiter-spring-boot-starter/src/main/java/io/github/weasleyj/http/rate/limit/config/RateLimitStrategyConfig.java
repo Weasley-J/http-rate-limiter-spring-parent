@@ -6,6 +6,7 @@ import io.github.weasleyj.http.rate.limit.RateLimitStrategy;
 import io.github.weasleyj.http.rate.limit.Strategy;
 import io.github.weasleyj.http.rate.limit.annotation.EnableHttpRateLimiter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 @ConditionalOnClass({EnableHttpRateLimiter.class})
 @EnableConfigurationProperties({HttpRateLimitProperties.class})
+@ConfigurationPropertiesScan({"io.github.weasleyj.http.rate.limit.config"})
 public class RateLimitStrategyConfig {
 
     /**

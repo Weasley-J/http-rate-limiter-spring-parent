@@ -5,7 +5,7 @@ import io.github.weasleyj.http.rate.limit.annotation.RateLimit;
 import io.github.weasleyj.http.rate.limit.config.HttpRateLimitProperties;
 import io.github.weasleyj.http.rate.limit.entity.RedisKeyRequest;
 import io.github.weasleyj.http.rate.limit.entity.RedisVersion;
-import io.github.weasleyj.http.rate.limit.interceptor.DefaultHttpRateLimitInterceptor;
+import io.github.weasleyj.http.rate.limit.interceptor.HttpRateLimitHandler;
 import io.github.weasleyj.http.rate.limit.util.TemporalUnitUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
@@ -47,7 +47,7 @@ public class DefaultCounterRateLimitStrategy implements RateLimitStrategy {
     @Override
     public boolean tryLimit(RateLimit rateLimit, Map<String, Object> headers, HttpServletRequest request) throws InterruptedException {
         if (CollectionUtils.isEmpty(headers)) return false;
-        String rateLimitKey = DefaultHttpRateLimitInterceptor.getRateLimitKey(new RedisKeyRequest()
+        String rateLimitKey = HttpRateLimitHandler.getRateLimitKey(new RedisKeyRequest()
                 .setHeaders(headers)
                 .setRateLimit(rateLimit)
                 .setHttpServletRequest(request)

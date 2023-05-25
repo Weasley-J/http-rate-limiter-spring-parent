@@ -42,7 +42,7 @@
         <dependency>
             <groupId>io.github.weasley-j</groupId>
             <artifactId>http-rate-limiter-spring-boot-starter</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </dependency>
         <!-- sa-token  -->
         <dependency>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.8.10</version>
+            <version>5.8.11</version>
         </dependency>
         <!-- redis启动器 -->
         <dependency>

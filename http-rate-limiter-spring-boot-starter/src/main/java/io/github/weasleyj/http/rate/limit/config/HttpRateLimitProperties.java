@@ -2,14 +2,11 @@ package io.github.weasleyj.http.rate.limit.config;
 
 import io.github.weasleyj.http.rate.limit.RateLimitStrategy;
 import io.github.weasleyj.http.rate.limit.Strategy;
-import io.github.weasleyj.http.rate.limit.annotation.EnableHttpRateLimiter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
@@ -24,8 +21,6 @@ import static io.github.weasleyj.http.rate.limit.config.HttpRateLimitProperties.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Configuration
-@ConditionalOnClass({EnableHttpRateLimiter.class})
 @ConfigurationProperties(prefix = PREFIX)
 public class HttpRateLimitProperties {
     public static final String PREFIX = "spring.http.rate.limiter";

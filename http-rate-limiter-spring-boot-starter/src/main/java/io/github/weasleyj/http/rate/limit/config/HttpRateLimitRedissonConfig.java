@@ -26,22 +26,17 @@ import redis.clients.jedis.JedisClientConfig;
  * @version 1.0.0
  */
 @Slf4j
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @ConditionalOnClass({EnableHttpRateLimiter.class})
 public class HttpRateLimitRedissonConfig {
-    private final HttpRateLimitProperties redisProperties;
-
-    public HttpRateLimitRedissonConfig(HttpRateLimitProperties redisProperties) {
-        this.redisProperties = redisProperties;
-    }
 
     /**
      * @return RedissonClient
      */
     @Bean
     @ConditionalOnMissingBean(value = {RedissonClient.class}, name = {"httpRateLimitRedissonClient"})
-    public RedissonClient httpRateLimitRedissonClient() {
-        HttpRateLimitProperties.RedisProperties redis = redisProperties.getRedis();
+    public RedissonClient httpRateLimitRedissonClient(HttpRateLimitProperties httpRateLimitProperties) {
+        HttpRateLimitProperties.RedisProperties redis = httpRateLimitProperties.getRedis();
         Config config = new Config();
         SingleServerConfig singleServer = config.useSingleServer()
                 .setUsername(redis.getUsername())
@@ -67,9 +62,10 @@ public class HttpRateLimitRedissonConfig {
 
     @Bean
     @ConditionalOnMissingBean({RedisVersion.class})
-    public RedisVersion redisVersion() {
+    public RedisVersion redisVersion(HttpRateLimitProperties httpRateLimitProperties) {
         RedisVersion version = new RedisVersion();
-        try (Jedis jedis = new Jedis(new HostAndPort(redisProperties.getRedis().getHost(), redisProperties.getRedis().getPort()), new RequestRestrictJedisClientConfig(redisProperties.getRedis()))) {
+        HttpRateLimitProperties.RedisProperties redisProperties = httpRateLimitProperties.getRedis();
+        try (Jedis jedis = new Jedis(new HostAndPort(redisProperties.getHost(), redisProperties.getPort()), new RequestRestrictJedisClientConfig(redisProperties))) {
             String server = jedis.info("server");
             if (StringUtils.isNotBlank(server)) {
                 String[] serverInfos = server.split("\r\n");

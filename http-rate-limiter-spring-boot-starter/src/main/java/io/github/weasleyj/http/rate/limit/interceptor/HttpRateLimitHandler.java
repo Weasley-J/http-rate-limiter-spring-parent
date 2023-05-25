@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 @Component
 @ConditionalOnClass({EnableHttpRateLimiter.class})
-public class DefaultHttpRateLimitInterceptor implements HandlerInterceptor {
+public class HttpRateLimitHandler implements HandlerInterceptor {
     /**
      * The throttling policy is dynamically changed at runtime
      */
@@ -46,7 +46,7 @@ public class DefaultHttpRateLimitInterceptor implements HandlerInterceptor {
     private final HttpRateLimitProperties httpRateLimitProperties;
     private final Map<Strategy, RateLimitStrategy> rateLimitStrategyMap;
 
-    public DefaultHttpRateLimitInterceptor(RedissonClient httpRateLimitRedissonClient, HttpRateLimitProperties httpRateLimitProperties, Map<Strategy, RateLimitStrategy> rateLimitStrategyMap) {
+    public HttpRateLimitHandler(RedissonClient httpRateLimitRedissonClient, HttpRateLimitProperties httpRateLimitProperties, Map<Strategy, RateLimitStrategy> rateLimitStrategyMap) {
         this.httpRateLimitRedissonClient = httpRateLimitRedissonClient;
         this.httpRateLimitProperties = httpRateLimitProperties;
         this.rateLimitStrategyMap = rateLimitStrategyMap;
