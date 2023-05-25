@@ -2,10 +2,10 @@ package io.github.weasleyj.http.rate.limit.annotation;
 
 import io.github.weasleyj.http.rate.limit.DefaultCounterRateLimitStrategy;
 import io.github.weasleyj.http.rate.limit.DefaultRedissonRateLimitStrategy;
+import io.github.weasleyj.http.rate.limit.HttpRateLimitHandler;
 import io.github.weasleyj.http.rate.limit.config.HttpRateLimitRedissonConfig;
 import io.github.weasleyj.http.rate.limit.config.HttpRateLimitWebMvcConfig;
 import io.github.weasleyj.http.rate.limit.config.RateLimitStrategyConfig;
-import io.github.weasleyj.http.rate.limit.interceptor.HttpRateLimitHandler;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

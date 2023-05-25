@@ -1,8 +1,5 @@
-package io.github.weasleyj.http.rate.limit.interceptor;
+package io.github.weasleyj.http.rate.limit;
 
-import io.github.weasleyj.http.rate.limit.RateLimitStrategy;
-import io.github.weasleyj.http.rate.limit.RequestLimitHandler;
-import io.github.weasleyj.http.rate.limit.Strategy;
 import io.github.weasleyj.http.rate.limit.annotation.EnableHttpRateLimiter;
 import io.github.weasleyj.http.rate.limit.annotation.RateLimit;
 import io.github.weasleyj.http.rate.limit.config.HttpRateLimitProperties;
