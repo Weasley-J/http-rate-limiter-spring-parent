@@ -180,7 +180,7 @@ public class HttpRateLimitHandler implements HandlerInterceptor {
                                 log.debug("Cookie解析到token {}: {}", cookie.getName(), cookie.getValue());
                             }
                             xAuthToken = cookie.getValue();
-                            headerMap.put(headerKey, cookie.getValue());
+                            headerMap.put(headerKey, xAuthToken);
                             break;
                         }
                     }
