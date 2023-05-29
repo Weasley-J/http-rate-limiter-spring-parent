@@ -55,15 +55,13 @@ public class DefaultRedissonRateLimitStrategy implements RateLimitStrategy {
             rRateLimiter.trySetRate(PER_CLIENT, rateLimit.maxCount(), rateLimit.value(), toRateIntervalUnit(rateLimit.timeUnit()));
             expireRateLimitKey(rateLimit, rRateLimiter);
         }
-        // 获取限流的配置信息
+
         RateLimiterConfig rateLimiterConfig = rRateLimiter.getConfig();
-        // 上次配置的限流时间毫秒值
         Long rateInterval = rateLimiterConfig.getRateInterval();
-        // 上次配置的限流次数
         Long rate = rateLimiterConfig.getRate();
-        // 将timeOut转换成毫秒之后再跟rateInterval进行比较
+
+        // 将timeOut转换成毫秒之后再跟rateInterval进行比较,RateLimiterConfig的配置跟我们注解上面的值不一致, 删除原有配置, 重新设置
         if (TimeUnit.MILLISECONDS.convert(rateLimit.value(), rateLimit.timeUnit()) != rateInterval || rateLimit.maxCount() != rate) {
-            // RateLimiterConfig的配置跟我们注解上面的值不一致, 删除原有配置, 重新设置
             rRateLimiter.delete();
             rRateLimiter.trySetRate(PER_CLIENT, rateLimit.maxCount(), rateLimit.value(), toRateIntervalUnit(rateLimit.timeUnit()));
             expireRateLimitKey(rateLimit, rRateLimiter);
