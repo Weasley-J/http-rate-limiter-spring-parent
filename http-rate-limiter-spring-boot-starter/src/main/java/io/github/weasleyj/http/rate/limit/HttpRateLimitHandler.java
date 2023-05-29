@@ -143,8 +143,6 @@ public class HttpRateLimitHandler implements HandlerInterceptor {
 
             RBucket<Object> bucket = httpRateLimitRedissonClient.getBucket(redisKeyName);
             if (bucket.isExists()) bucket.delete();
-
-            RequestLimitHandler.remove();
         }
     }
 
