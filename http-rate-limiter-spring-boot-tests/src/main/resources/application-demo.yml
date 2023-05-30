@@ -11,6 +11,8 @@ spring:
     rate:
       limiter:
         enable: on
+        # 限流策略
+        strategy: counter
         header-keys:
           - x-auth-token
         redis:

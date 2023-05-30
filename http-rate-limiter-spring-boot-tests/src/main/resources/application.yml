@@ -1,10 +1,9 @@
 server:
   port: 8080
 
-
 spring:
   application:
-    name: http-rate-limiter-spring-boot-tests
+    name: http-rate-limiter-app
 
   profiles:
     active: demo

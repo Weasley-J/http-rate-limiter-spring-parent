@@ -22,7 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -35,10 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ConditionalOnClass({EnableHttpRateLimiter.class})
 public class HttpRateLimitHandler implements HandlerInterceptor {
-    /**
-     * The throttling policy is dynamically changed at runtime
-     */
-    public static final ThreadLocal<RateLimitStrategy> RUNTIME_STRATEGY = new ThreadLocal<>();
     private final RedissonClient httpRateLimitRedissonClient;
     private final HttpRateLimitProperties httpRateLimitProperties;
     private final Map<Strategy, RateLimitStrategy> rateLimitStrategyMap;
@@ -125,7 +126,6 @@ public class HttpRateLimitHandler implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        RUNTIME_STRATEGY.remove();
         if (RequestLimitHandler.shouldCancelLimit()) {
             Map<String, Object> headers = handleHeaderValueFromHttpHeader(request);
             handleHeaderValueFromCookie(request, headers);
@@ -204,12 +204,11 @@ public class HttpRateLimitHandler implements HandlerInterceptor {
     }
 
     /**
+     * To deduce rate limit strategy
+     *
      * @return The RateLimitStrategy
      */
     public RateLimitStrategy deduceRateLimitStrategy() {
-        if (null != RUNTIME_STRATEGY.get()) {
-            return RUNTIME_STRATEGY.get();
-        }
         return this.rateLimitStrategyMap.get(this.httpRateLimitProperties.getStrategy());
     }
 }
