@@ -1,10 +1,15 @@
 package com.example.request.controller;
 
+import com.example.request.strategy.MyReteLimitStrategy;
 import io.github.weasleyj.http.rate.limit.CancelLimitStrategy;
 import io.github.weasleyj.http.rate.limit.RequestLimitHandler;
 import io.github.weasleyj.http.rate.limit.annotation.RateLimit;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.TimeUnit;
 
@@ -58,6 +63,30 @@ public class RateLimitDemoController {
     @RateLimit(value = 10, maxCount = 2, timeUnit = TimeUnit.SECONDS, cookieName = "x-auth-token")
     public String click2Times10SecondsByCookieName() {
         log.info("指定cookieName: 10秒内仅能点击2次");
+        return "ok";
+    }
+
+    /**
+     * yaml配置文件里面指定用户自定义的限流策略类
+     *
+     * @apiNote 不推荐注解里面指定strategy
+     */
+    @PostMapping("/myReteLimitStrategyWithYamlConfig")
+    @RateLimit(value = 10, maxCount = 1, timeUnit = TimeUnit.SECONDS)
+    public String myReteLimitStrategyWithYamlConfig() {
+        log.info("使用自定义限流策略(Yaml): ......");
+        return "ok";
+    }
+
+    /**
+     * yaml配置文件里面指定用户自定义的限流策略类
+     *
+     * @apiNote 不推荐注解里面指定strategy
+     */
+    @PostMapping("/myReteLimitStrategy")
+    @RateLimit(value = 10, maxCount = 1, timeUnit = TimeUnit.SECONDS, strategy = MyReteLimitStrategy.class)
+    public String myReteLimitStrategy() {
+        log.info("使用自定义限流策略: ......");
         return "ok";
     }
 

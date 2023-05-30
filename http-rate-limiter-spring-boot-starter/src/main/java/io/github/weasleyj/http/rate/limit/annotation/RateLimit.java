@@ -1,8 +1,14 @@
 package io.github.weasleyj.http.rate.limit.annotation;
 
+import io.github.weasleyj.http.rate.limit.RateLimitStrategy;
 import io.github.weasleyj.http.rate.limit.config.HttpRateLimitProperties;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,4 +59,11 @@ public @interface RateLimit {
      * @see HttpRateLimitProperties#headerKeys
      */
     String cookieName() default "";
+
+    /**
+     * @return The rate limit strategy of users
+     * @apiNote It's recommended to use the YAML to configure the throttling policy to improve performance
+     * @see HttpRateLimitProperties#strategyClass
+     */
+    Class<? extends RateLimitStrategy> strategy() default RateLimitStrategy.class;
 }

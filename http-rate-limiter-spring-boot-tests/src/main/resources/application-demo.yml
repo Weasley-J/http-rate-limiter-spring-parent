@@ -12,7 +12,9 @@ spring:
       limiter:
         enable: on
         # 限流策略
-        strategy: counter
+        strategy: customize
+        strategy-class: com.example.request.strategy.MyReteLimitStrategy
+
         header-keys:
           - x-auth-token
         redis:

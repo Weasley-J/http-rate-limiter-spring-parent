@@ -17,6 +17,6 @@ public enum Strategy {
     /**
      * The customize strategy of users
      */
-    CUSTOMIZATION,
+    CUSTOMIZE,
     ;
 }

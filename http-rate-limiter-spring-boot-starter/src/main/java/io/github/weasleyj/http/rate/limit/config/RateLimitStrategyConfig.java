@@ -35,7 +35,7 @@ public class RateLimitStrategyConfig {
     public Map<Strategy, RateLimitStrategy> rateLimitStrategyMap(ApplicationContext applicationContext, HttpRateLimitProperties httpRateLimitProperties) {
         Map<Strategy, RateLimitStrategy> strategies = new ConcurrentHashMap<>(16);
         if (null != httpRateLimitProperties.getStrategyClass()) {
-            strategies.put(Strategy.CUSTOMIZATION, ClassUtils.newInstance(httpRateLimitProperties.getStrategyClass()));
+            strategies.put(Strategy.CUSTOMIZE, ClassUtils.newInstance(httpRateLimitProperties.getStrategyClass()));
         }
         Map<String, RateLimitStrategy> beans = applicationContext.getBeansOfType(RateLimitStrategy.class);
         beans.forEach((k, v) -> {

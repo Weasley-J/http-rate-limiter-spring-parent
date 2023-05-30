@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.objenesis.instantiator.util.ClassUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
@@ -114,7 +115,7 @@ public class HttpRateLimitHandler implements HandlerInterceptor {
                 return true;
             }
         }
-        boolean shouldLimit = this.deduceRateLimitStrategy().tryLimit(rateLimit, headers, request);
+        boolean shouldLimit = this.deduceRateLimitStrategy(rateLimit).tryLimit(rateLimit, headers, request);
         if (shouldLimit) {
             log.warn("触发防刷，接口URI：{}, header_map: {}", request.getRequestURI(), headers);
             String formatMsg = MessageFormat.format("接口：{0}, {1} {2} 内仅能请求 {3} 次", request.getRequestURI(), rateLimit.value(), rateLimit.timeUnit().toString().toLowerCase(), rateLimit.maxCount());
@@ -208,7 +209,10 @@ public class HttpRateLimitHandler implements HandlerInterceptor {
      *
      * @return The RateLimitStrategy
      */
-    public RateLimitStrategy deduceRateLimitStrategy() {
+    public RateLimitStrategy deduceRateLimitStrategy(RateLimit rateLimit) {
+        if (null != rateLimit.strategy() && rateLimit.strategy() != RateLimitStrategy.class) {
+            return ClassUtils.newInstance(rateLimit.strategy());
+        }
         return this.rateLimitStrategyMap.get(this.httpRateLimitProperties.getStrategy());
     }
 }
