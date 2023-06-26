@@ -26,6 +26,13 @@ class HttpRateLimitRedissonClientTests {
     @Autowired
     private RedissonClient httpRateLimitRedissonClient;
 
+    @Test
+    void testSaveOther() {
+        RBucket<Integer> bucket = httpRateLimitRedissonClient.getBucket("redisson_client:test:add", new TypedJsonJacksonCodec(Integer.class));
+        Integer andSet = bucket.getAndSet(666, 30, TimeUnit.DAYS);
+        System.err.println(JacksonUtil.toJson(andSet));
+    }
+
 
     @Test
     void testSaveUserBucket() {
