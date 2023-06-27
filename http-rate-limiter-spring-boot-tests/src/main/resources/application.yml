@@ -7,3 +7,8 @@ spring:
 
   profiles:
     active: demo
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 2d
