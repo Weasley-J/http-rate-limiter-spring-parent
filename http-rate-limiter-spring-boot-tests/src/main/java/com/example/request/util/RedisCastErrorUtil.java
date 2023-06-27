@@ -29,9 +29,6 @@ public class RedisCastErrorUtil {
      * @return RedissonClient用来存取json数据的目标Bucket
      */
     public static <T> RBucket<T> handleCastError(RedisCastWrapper<T> wrapper) {
-        if (null == wrapper.getTargetBucket()) {
-            return null;
-        }
         if (wrapper.getException().getCause() instanceof JsonParseException
                 || wrapper.getException().getCause() instanceof ClassCastException
                 || wrapper.getException() instanceof ClassCastException) {
