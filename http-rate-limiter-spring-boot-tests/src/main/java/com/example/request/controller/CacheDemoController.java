@@ -72,7 +72,7 @@ public class CacheDemoController {
                 return bucket.get();
             }
         } catch (Exception e) {
-            bucket = RedisCastErrorUtil.handleRedisCastError(new RedisCastWrapper<HumanDTO>()
+            bucket = RedisCastErrorUtil.handleCastError(new RedisCastWrapper<HumanDTO>()
                     .setRedissonClient(httpRateLimitRedissonClient)
                     .setTargetBucket(bucket)
                     .setRedisKey(name)

@@ -66,7 +66,7 @@ class HttpRateLimitRedissonClientTests {
                 // TODO: 2023/6/27 返回结果
             }
         } catch (Exception e) {
-            targetBucket = RedisCastErrorUtil.handleRedisCastError(new RedisCastWrapper<Person>()
+            targetBucket = RedisCastErrorUtil.handleCastError(new RedisCastWrapper<Person>()
                     .setRedissonClient(httpRateLimitRedissonClient)
                     .setTargetBucket(targetBucket)
                     .setRedisKey(prefix)
