@@ -13,6 +13,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Redis Cast Error Util
@@ -31,6 +32,7 @@ public class RedisCastErrorUtil {
     public static <T> RBucket<T> handleCastError(RedisCastWrapper<T> wrapper) {
         if (wrapper.getException().getCause() instanceof JsonParseException
                 || wrapper.getException().getCause() instanceof ClassCastException
+                || wrapper.getException() instanceof JsonParseException
                 || wrapper.getException() instanceof ClassCastException) {
             log.warn("处理Redis类型转换异常处理：{}", wrapper.getException().getMessage());
             RBucket<Object> originBucket = wrapper.getRedissonClient().getBucket(wrapper.getRedisKey());
@@ -39,12 +41,12 @@ public class RedisCastErrorUtil {
                 String jsonValue = JacksonUtil.toJson(originBucket.get());
                 T originData = JacksonUtil.readValue(jsonValue, new TypeReference<T>() {
                 });
-                wrapper.getTargetBucket().set(originData);
+                wrapper.getTargetBucket().set(originData, wrapper.getTimeToLive(), wrapper.getTimeUnit());
             }
         }
         // 将本次需要存放与targetBucket中的数据进行缓存
         if (null != wrapper.getPayload()) {
-            wrapper.getTargetBucket().set(wrapper.getPayload());
+            wrapper.getTargetBucket().set(wrapper.getPayload(), wrapper.getTimeToLive(), wrapper.getTimeUnit());
         }
         return wrapper.getTargetBucket();
     }
@@ -71,6 +73,14 @@ public class RedisCastErrorUtil {
          * 源Redis的key
          */
         private String redisKey;
+        /**
+         * 过期时间
+         */
+        private long timeToLive = 30;
+        /**
+         * 过期时间单位
+         */
+        private TimeUnit timeUnit = TimeUnit.DAYS;
         /**
          * 数据载荷（本次需要存放与targetBucket中的数据）
          */

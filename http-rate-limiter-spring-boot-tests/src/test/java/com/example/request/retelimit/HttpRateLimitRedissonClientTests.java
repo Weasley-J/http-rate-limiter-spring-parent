@@ -63,17 +63,19 @@ class HttpRateLimitRedissonClientTests {
         try {
             if (targetBucket.isExists()) {
                 Person person = targetBucket.get();
-                // TODO: 2023/6/27 返回结果
+                // TODO: 2023/6/27 如果存在直接返回Bucket中的数据
             }
         } catch (Exception e) {
             targetBucket = RedisCastErrorUtil.handleCastError(new RedisCastWrapper<Person>()
                     .setRedissonClient(httpRateLimitRedissonClient)
                     .setTargetBucket(targetBucket)
                     .setRedisKey(prefix)
+                    .setTimeToLive(1)
+                    .setTimeUnit(TimeUnit.DAYS)
                     .setPayload(null)
                     .setException(e));
         }
-        System.err.println(JacksonUtil.toJson(targetBucket.get()));
+        System.err.println(JacksonUtil.toJson(targetBucket.get())); //{"name":"张三","age":18,"sex":1,"ext":null}
     }
 
     @Test
@@ -83,11 +85,9 @@ class HttpRateLimitRedissonClientTests {
         user.setName("张三");
         user.setAge(18);
         user.setSex(1);
-
-        RBucket<User> bucket = httpRateLimitRedissonClient.getBucket(prefix, new TypedJsonJacksonCodec(User.class));
-        RBucket<User> bucket2 = httpRateLimitRedissonClient.getBucket(prefix, new TypedJsonJacksonCodec(new TypeReference<User>() {
+        RBucket<User> bucket = httpRateLimitRedissonClient.getBucket(prefix, new TypedJsonJacksonCodec(new TypeReference<User>() {
         }));
-        bucket2.set(user, 30, TimeUnit.DAYS);
+        bucket.set(user, 30, TimeUnit.DAYS);
         System.err.println(JacksonUtil.toJson(user));
     }
 

@@ -6,7 +6,7 @@ spring:
     name: http-rate-limiter-app
 
   profiles:
-    active: demo
+    active: lwj
 
   cache:
     type: redis
