@@ -86,7 +86,8 @@ public class CacheDemoController {
      * 从删除缓存用户
      */
     @DeleteMapping("/user/delete/{id}")
-    @CacheEvict(value = REDIS_PREFIX, key = "#root.args[0]")
+    @CacheEvict(value = REDIS_PREFIX, key = "#id")
+    //@CacheEvict(value = REDIS_PREFIX, key = "#root.args[0]")
     public Long delete(@PathVariable("id") Long id) {
         log.warn("delete id {}", id);
         return id;
