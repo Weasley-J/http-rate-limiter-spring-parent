@@ -36,6 +36,12 @@ public class RedisCastErrorUtil {
                 || wrapper.getException() instanceof ClassCastException) {
             log.warn("处理Redis类型转换异常处理：{}", wrapper.getException().getMessage());
             RBucket<Object> originBucket = wrapper.getRedissonClient().getBucket(wrapper.getRedisKey());
+            // 将本次需要存放与targetBucket中的数据进行缓存
+            if (null != wrapper.getPayload()) {
+                originBucket.delete();
+                wrapper.getTargetBucket().set(wrapper.getPayload(), wrapper.getTimeToLive(), wrapper.getTimeUnit());
+                return wrapper.getTargetBucket();
+            }
             // 将旧数据转为json存储于targetBucket中
             if (originBucket.isExists() && null != originBucket.get()) {
                 String jsonValue = JacksonUtil.toJson(originBucket.get());
@@ -43,10 +49,6 @@ public class RedisCastErrorUtil {
                 });
                 wrapper.getTargetBucket().set(originData, wrapper.getTimeToLive(), wrapper.getTimeUnit());
             }
-        }
-        // 将本次需要存放与targetBucket中的数据进行缓存
-        if (null != wrapper.getPayload()) {
-            wrapper.getTargetBucket().set(wrapper.getPayload(), wrapper.getTimeToLive(), wrapper.getTimeUnit());
         }
         return wrapper.getTargetBucket();
     }
