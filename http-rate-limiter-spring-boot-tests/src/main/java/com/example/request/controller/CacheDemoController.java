@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/public/cache")
 public class CacheDemoController {
-    protected static final String PREFIX = "redisson_client:test:human";
+    protected static final String REDIS_PREFIX = "redisson_client:test:human";
     @Autowired
     private RedissonClient httpRateLimitRedissonClient;
 
@@ -37,7 +37,7 @@ public class CacheDemoController {
      * 缓存用对象
      */
     @PostMapping("/user/add/{id}")
-    @CachePut(value = PREFIX, key = "#id") // key: redisson_client:test:human:id
+    @CachePut(value = REDIS_PREFIX, key = "#id") // key: redisson_client:test:human:id
     public Human add(@PathVariable("id") Long id) {
         log.warn("add {}", id);
         Human human = new Human();
@@ -53,7 +53,7 @@ public class CacheDemoController {
      * 从缓存中获取用户
      */
     @GetMapping("/user/info/{id}")
-    @Cacheable(value = PREFIX, key = "#root.args[0]")
+    @Cacheable(value = REDIS_PREFIX, key = "#root.args[0]")
     public Human getHuman(@PathVariable("id") Long id) {
         log.warn("getHuman id {}", id);
         return new Human();
@@ -65,7 +65,7 @@ public class CacheDemoController {
     @GetMapping("/user/info/dto/{id}")
     public HumanDTO getHumanDTO(@PathVariable("id") Long id) {
         log.warn("getHumanDTO id {}", id);
-        String name = PREFIX + ":" + id;
+        String name = REDIS_PREFIX + ":" + id;
         RBucket<HumanDTO> bucket = httpRateLimitRedissonClient.getBucket(name, new TypedJsonJacksonCodec(HumanDTO.class));
         try {
             if (bucket.isExists()) {
@@ -86,7 +86,7 @@ public class CacheDemoController {
      * 从删除缓存用户
      */
     @DeleteMapping("/user/delete/{id}")
-    @CacheEvict(value = PREFIX, key = "#root.args[0]")
+    @CacheEvict(value = REDIS_PREFIX, key = "#root.args[0]")
     public Long delete(@PathVariable("id") Long id) {
         log.warn("delete id {}", id);
         return id;
