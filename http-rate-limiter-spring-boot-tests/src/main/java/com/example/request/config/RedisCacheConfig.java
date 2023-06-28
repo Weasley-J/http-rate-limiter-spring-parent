@@ -21,7 +21,8 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 /**
- * <b>Spring缓存redis配置类</b>
+ * Spring缓存redis配置类
+ * <p>
  * 保存序列化对象为String,自定义生成key,value的策略
  *
  * @author Weasley J
@@ -35,18 +36,18 @@ public class RedisCacheConfig extends CachingConfigurerSupport {
     public RedisCacheConfiguration redisCacheConfiguration(CacheProperties cacheProperties, ObjectMapper objectMapper) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
         Jackson2JsonRedisSerializer<Object> jsonSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-        ObjectMapper mapper = objectMapper.copy();
+        ObjectMapper mapper = objectMapper != null ? objectMapper.copy() : new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         jsonSerializer.setObjectMapper(mapper);
 
-        //设置key-value序列化器
+        // 设置key-value序列化器
         config = config.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
         config = config.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer));
         config = config.computePrefixWith(name -> name + ":");
 
-        // 将配置文件的配置也生效
+        // 使原有配置文件的配置生效
         CacheProperties.Redis redisProperties = cacheProperties.getRedis();
         if (redisProperties.getTimeToLive() != null) {
             config = config.entryTtl(redisProperties.getTimeToLive());
