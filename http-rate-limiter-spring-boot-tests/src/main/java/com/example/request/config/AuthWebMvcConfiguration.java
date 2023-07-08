@@ -53,7 +53,6 @@ public class AuthWebMvcConfiguration implements WebMvcConfigurer {
             while (headerNames.hasMoreElements()) {
                 String headerName = headerNames.nextElement();
                 String headerValue = request.getHeader(headerName);
-                log.info("获取到请求头 {}: {}", headerName, headerValue);
             }
 
             boolean login = StpUtil.isLogin();

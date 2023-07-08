@@ -1,6 +1,8 @@
 package io.github.weasleyj.http.rate.limit.util;
 
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,7 +42,7 @@ public class TemporalUnitUtils {
             case NANOS:
                 return TimeUnit.NANOSECONDS;
             default:
-                throw new UnsupportedOperationException("Not a real temporal unit");
+                throw new UnsupportedOperationException("Not a real temporal unit: " + chronoUnit);
         }
     }
 
@@ -70,7 +72,46 @@ public class TemporalUnitUtils {
             case NANOSECONDS:
                 return ChronoUnit.NANOS;
             default:
-                throw new UnsupportedOperationException("Not a real time unit");
+                throw new UnsupportedOperationException("Not a real time unit: " + timeUnit);
         }
+    }
+
+
+    /**
+     * Convert time unit to LocalDateTime
+     *
+     * @param duration     the length of time
+     * @param timeUnit     the unit of time
+     * @param baseDateTime reference time point
+     * @return {@link LocalDateTime}
+     */
+    public static LocalDateTime convertToDateTime(long duration, TimeUnit timeUnit, LocalDateTime baseDateTime) {
+        TemporalUnit temporalUnit;
+        switch (timeUnit) {
+            case NANOSECONDS:
+                temporalUnit = ChronoUnit.NANOS;
+                break;
+            case MICROSECONDS:
+                temporalUnit = ChronoUnit.MICROS;
+                break;
+            case MILLISECONDS:
+                temporalUnit = ChronoUnit.MILLIS;
+                break;
+            case SECONDS:
+                temporalUnit = ChronoUnit.SECONDS;
+                break;
+            case MINUTES:
+                temporalUnit = ChronoUnit.MINUTES;
+                break;
+            case HOURS:
+                temporalUnit = ChronoUnit.HOURS;
+                break;
+            case DAYS:
+                temporalUnit = ChronoUnit.DAYS;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported TimeUnit: " + timeUnit);
+        }
+        return baseDateTime.plus(duration, temporalUnit);
     }
 }

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
+import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -38,6 +39,7 @@ public class HttpRateLimitRedissonConfig {
     public RedissonClient httpRateLimitRedissonClient(HttpRateLimitProperties httpRateLimitProperties) {
         HttpRateLimitProperties.RedisProperties redis = httpRateLimitProperties.getRedis();
         Config config = new Config();
+        config.setCodec(new JsonJacksonCodec());
         SingleServerConfig singleServer = config.useSingleServer()
                 .setUsername(redis.getUsername())
                 .setPassword(redis.getPassword())

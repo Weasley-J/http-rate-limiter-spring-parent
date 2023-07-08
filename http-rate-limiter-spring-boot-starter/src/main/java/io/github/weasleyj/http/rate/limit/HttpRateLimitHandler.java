@@ -169,7 +169,7 @@ public class HttpRateLimitHandler implements HandlerInterceptor {
     /**
      * handle header value from cookie
      */
-    public void handleHeaderValueFromCookie(HttpServletRequest request, Map<String, Object> headerMap) {
+    public Map<String, Object> handleHeaderValueFromCookie(HttpServletRequest request, Map<String, Object> headerMap) {
         String xAuthToken;
         for (String headerKey : httpRateLimitProperties.getHeaderKeys()) {
             try {
@@ -190,6 +190,7 @@ public class HttpRateLimitHandler implements HandlerInterceptor {
                 log.error("解析headerKe {}发生异常 {}", headerKey, headerMap, e);
             }
         }
+        return headerMap;
     }
 
     /**

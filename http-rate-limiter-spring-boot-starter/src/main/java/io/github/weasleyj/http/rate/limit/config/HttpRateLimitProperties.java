@@ -1,10 +1,9 @@
 package io.github.weasleyj.http.rate.limit.config;
 
+import io.github.weasleyj.http.rate.limit.CacheType;
 import io.github.weasleyj.http.rate.limit.RateLimitStrategy;
 import io.github.weasleyj.http.rate.limit.Strategy;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
@@ -19,8 +18,6 @@ import static io.github.weasleyj.http.rate.limit.config.HttpRateLimitProperties.
  * @version 1.0.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @ConfigurationProperties(prefix = PREFIX)
 public class HttpRateLimitProperties {
     public static final String PREFIX = "spring.http.rate.limiter";
@@ -28,6 +25,10 @@ public class HttpRateLimitProperties {
      * 是否启用
      */
     private Boolean enable = false;
+    /**
+     * The storage type of cache
+     */
+    private CacheType cacheType = CacheType.MEMORY;
     /**
      * Rate limit strategy
      */
@@ -53,8 +54,6 @@ public class HttpRateLimitProperties {
      * redis配置属性
      */
     @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class RedisProperties {
         /**
          * Redis的缓存key的前缀
